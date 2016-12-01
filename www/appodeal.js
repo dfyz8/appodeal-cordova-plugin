@@ -3,8 +3,7 @@ var Appodeal = exports;
 var exec = require('cordova/exec');
 var cordova = require('cordova');
 
-Appodeal.INTERSTITIAL = 1;
-Appodeal.SKIPPABLE_VIDEO = 2;
+Appodeal.INTERSTITIAL = 3;
 Appodeal.BANNER = 4;
 Appodeal.BANNER_BOTTOM = 8;
 Appodeal.BANNER_TOP = 16;
@@ -107,9 +106,6 @@ Appodeal.enableInterstitialCallbacks = function(listener) {
     exec(null, null, "AppodealPlugin", "enableInterstitialCallbacks", [listener]);
 };
 
-Appodeal.enableSkippableVideoCallbacks = function(listener) {
-    exec(null, null, "AppodealPlugin", "enableSkippableVideoCallbacks", [listener]);
-};
 
 Appodeal.enableNonSkippableVideoCallbacks = function(listener) {
     exec(null, null, "AppodealPlugin", "enableNonSkippableVideoCallbacks", [listener]);

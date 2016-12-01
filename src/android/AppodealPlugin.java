@@ -13,7 +13,6 @@ import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.BannerCallbacks;
 import com.appodeal.ads.InterstitialCallbacks;
 import com.appodeal.ads.RewardedVideoCallbacks;
-import com.appodeal.ads.SkippableVideoCallbacks;
 import com.appodeal.ads.NonSkippableVideoCallbacks;
 import com.appodeal.ads.UserSettings;
 
@@ -54,7 +53,6 @@ public class AppodealPlugin extends CordovaPlugin {
     private static final String ACTION_DISABLE_WRITE_EXTERNAL_STORAGE_CHECK = "disableWriteExternalStoragePermissionCheck";
 
     private static final String ACTION_ENABLE_INTERSTITIAL_CALLBACKS = "enableInterstitialCallbacks";
-    private static final String ACTION_ENABLE_SKIPPABLE_VIDEO_CALLBACKS = "enableSkippableVideoCallbacks";
     private static final String ACTION_ENABLE_NON_SKIPPABLE_VIDEO_CALLBACKS = "enableNonSkippableVideoCallbacks";
     private static final String ACTION_ENABLE_REWARDED_CALLBACKS = "enableRewardedVideoCallbacks";
     private static final String ACTION_ENABLE_BANNER_CALLBACKS = "enableBannerCallbacks";
@@ -196,7 +194,7 @@ public class AppodealPlugin extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Appodeal.setOnLoadedTriggerBoth(getAdType(adType), setOnTriggerBoth);
+                    Appodeal.setTriggerOnLoadedOnPrecache(getAdType(adType), setOnTriggerBoth);
                 }
             });
             return true;
@@ -355,17 +353,6 @@ public class AppodealPlugin extends CordovaPlugin {
                 public void run() {
                     if(setNonSkippableVideoCallbacks) {
                         Appodeal.setNonSkippableVideoCallbacks(nonSkippableVideoListener);
-                    }
-                }
-            });
-            return true;
-        } else if (action.equals(ACTION_ENABLE_SKIPPABLE_VIDEO_CALLBACKS)) {
-            final boolean setSkippableVideoCallbacks = args.getBoolean(0);
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(setSkippableVideoCallbacks) {
-                        Appodeal.setSkippableVideoCallbacks(skippableVideoListener);
                     }
                 }
             });
@@ -536,9 +523,6 @@ public class AppodealPlugin extends CordovaPlugin {
         if((adtype & 1) > 0) {
             type |= Appodeal.INTERSTITIAL;
         }
-        if((adtype & 2) > 0) {
-            type |= Appodeal.SKIPPABLE_VIDEO;
-        }
         if((adtype & 4) > 0) {
             type |= Appodeal.BANNER;
         }
@@ -608,60 +592,16 @@ public class AppodealPlugin extends CordovaPlugin {
                 }
             });
         }
-    };
-
-    private SkippableVideoCallbacks skippableVideoListener = new SkippableVideoCallbacks() {
-
-        @Override
-        public void onSkippableVideoClosed(boolean finished) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+		
+		@Override
+		public void onInterstitialFinished(){
+			new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onSkippableVideoClosed');");
+                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onInterstitialFinished');");
                 }
             });
-        }
-
-        @Override
-        public void onSkippableVideoFailedToLoad() {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onSkippableVideoFailedToLoad');");
-                }
-            });
-        }
-
-        @Override
-        public void onSkippableVideoFinished() {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onSkippableVideoFinished');");
-                }
-            });
-        }
-
-        @Override
-        public void onSkippableVideoLoaded() {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onSkippableVideoLoaded');");
-                }
-            });
-        }
-
-        @Override
-        public void onSkippableVideoShown() {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onSkippableVideoShown');");
-                }
-            });
-        }
-
+		}
     };
 
     private NonSkippableVideoCallbacks nonSkippableVideoListener = new NonSkippableVideoCallbacks() {
